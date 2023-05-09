@@ -1,4 +1,6 @@
 import { UserDatabase } from "../database/UserDatabase"
+import { DeleteUserOutputDTO, DeleteUsersInputDTO } from "../dtos/user/deleteUsers.dto"
+import { GetUsersbyidInputDTO, GetUsersbyidOutputDTO } from "../dtos/user/getUserbyid.dto"
 import { GetUsersInputDTO, GetUsersOutputDTO } from "../dtos/user/getUsers.dto"
 import { LoginInputDTO, LoginOutputDTO } from "../dtos/user/login.dto"
 import { SignupInputDTO, SignupOutputDTO } from "../dtos/user/signup.dto"
@@ -95,6 +97,8 @@ export class UserBusiness {
 
     const userDB = await this.userDatabase.findUserByEmail(email)
 
+    console.log("to aqui")
+
     if (!userDB) {
       throw new NotFoundError("'email' não encontrado")
     }
@@ -128,6 +132,74 @@ export class UserBusiness {
       message: "Login realizado com sucesso",
       token: token
     }
+
+    return output
+  }
+  public deleteUsers = async (
+    input: DeleteUsersInputDTO
+  ): Promise<DeleteUserOutputDTO> => {
+    const { q, token } = input
+
+    const payload = this.tokenManager.getPayload(token)
+
+    if (payload === null) {
+        throw new BadRequestError("token inválido")
+    } 
+
+    if (payload.role !== USER_ROLES.ADMIN) {
+      throw new BadRequestError("somente admins podem acessar")
+    }
+
+    const usersDB = await this.userDatabase.findUserById(q)
+
+    if(usersDB){
+      await this.userDatabase.deteleUser(usersDB?.id)
+    }
+    else{
+      throw new NotFoundError("Usuário não encontrado.")
+    }
+
+
+
+    // const output: DeleteUserOutputDTO = {
+    //   message: "Usuário apagado com sucesso"
+    // }
+    const output = "Usuário apagado com sucesso"
+
+    return output
+  }
+
+  public getUserbyId = async (
+    input: GetUsersbyidInputDTO
+  ): Promise<GetUsersbyidOutputDTO> => {
+    const { q, token } = input
+
+    const payload = this.tokenManager.getPayload(token)
+
+    if (payload === null) {
+        throw new BadRequestError("token inválido")
+    } 
+
+    if (payload.role !== USER_ROLES.ADMIN) {
+      throw new BadRequestError("somente admins podem acessar")
+    }
+
+    const usersDB = await this.userDatabase.findUserById(q)
+
+    // const users = usersDB.map((userDB) => {
+    //   const user = new User(
+    //     userDB.id,
+    //     userDB.name,
+    //     userDB.email,
+    //     userDB.password,
+    //     userDB.role,
+    //     userDB.created_at
+    //   )
+
+    //   return user.toBusinessModel()
+    // })
+
+    const output: any = usersDB
 
     return output
   }

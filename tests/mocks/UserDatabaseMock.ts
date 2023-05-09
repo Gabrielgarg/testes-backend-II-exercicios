@@ -53,4 +53,13 @@ export class UserDatabaseMock extends BaseDatabase {
   ): Promise<void> {
 
   }
+  public async deteleUser(id: string): Promise<void> {
+    let index = 0
+    for(let x = 0; x<usersMock.length; x++){
+        if(usersMock[x].id === id){
+          index = x
+        }
+    }
+    usersMock.slice(index,1)
+  }
 }

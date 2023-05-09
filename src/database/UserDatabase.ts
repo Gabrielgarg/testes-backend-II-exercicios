@@ -12,7 +12,7 @@ export class UserDatabase extends BaseDatabase {
     if (q) {
       const result: UserDB[] = await BaseDatabase
         .connection(UserDatabase.TABLE_USERS)
-        .where("name", "LIKE", `%${q}%`)
+        .where("id", "LIKE", `%${q}%`)
 
       usersDB = result
     } else {
@@ -28,7 +28,7 @@ export class UserDatabase extends BaseDatabase {
   public async findUserById(
     id: string
   ): Promise<UserDB | undefined> {
-    const [userDB]: UserDB[] | undefined[] = await BaseDatabase
+    const userDB: any = await BaseDatabase
       .connection(UserDatabase.TABLE_USERS)
       .where({ id })
 
@@ -51,5 +51,10 @@ export class UserDatabase extends BaseDatabase {
     await BaseDatabase
       .connection(UserDatabase.TABLE_USERS)
       .insert(newUserDB)
+  }
+
+  public async deteleUser(id: string): Promise<void> {
+    await BaseDatabase
+      .connection(UserDatabase.TABLE_USERS).delete().where({id})
   }
 }

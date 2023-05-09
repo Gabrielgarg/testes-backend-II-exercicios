@@ -12,3 +12,8 @@ export const GetUsersSchema = z.object({
   q: z.string().min(1).optional(),
   token: z.string().min(1)
 }).transform(data => data as GetUsersInputDTO)
+
+export const GetUsersbyidSchema = z.object({
+  q: z.string().min(1).optional(),
+  token: z.string().min(1)
+}).transform(data => data as GetUsersInputDTO)

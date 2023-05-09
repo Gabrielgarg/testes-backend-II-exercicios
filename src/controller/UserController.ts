@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { UserBusiness } from "../business/UserBusiness"
-import { GetUsersSchema } from "../dtos/user/getUsers.dto"
+import { GetUsersSchema, GetUsersbyidSchema } from "../dtos/user/getUsers.dto"
 import { ZodError } from "zod"
 import { BaseError } from "../errors/BaseError"
 import { LoginSchema } from "../dtos/user/login.dto"
@@ -66,6 +66,54 @@ export class UserController {
       })
 
       const output = await this.userBusiness.login(input)
+
+      res.status(200).send(output)
+    } catch (error) {
+      console.log(error)
+
+      if (error instanceof ZodError) {
+        res.status(400).send(error.issues)
+      } else if (error instanceof BaseError) {
+        res.status(error.statusCode).send(error.message)
+      } else {
+        res.status(500).send("Erro inesperado")
+      }
+    }
+  }
+
+  public getUsersbyid = async (req: Request, res: Response) => {
+    try {
+      const input = GetUsersbyidSchema.parse({
+        q: req.query.q as string,
+        token: req.headers.authorization
+      })
+
+      console.log("o valor do q é",input.q)
+
+      const output = await this.userBusiness.getUsers(input)
+
+      res.status(200).send(output)
+    } catch (error) {
+      console.log(error)
+
+      if (error instanceof ZodError) {
+        res.status(400).send(error.issues)
+      } else if (error instanceof BaseError) {
+        res.status(error.statusCode).send(error.message)
+      } else {
+        res.status(500).send("Erro inesperado")
+      }
+    }
+  }
+
+  public deleteUserbyid = async (req: Request, res: Response) => {
+    try {
+      const input = GetUsersbyidSchema.parse({
+        q: req.query.q,
+        token: req.headers.authorization
+      })
+
+      const output = await this.userBusiness.deleteUsers(input)
 
       res.status(200).send(output)
     } catch (error) {
